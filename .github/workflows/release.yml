@@ -1,0 +1,56 @@
+# 推 v* 标签时：在 Windows 上打便携版和安装版，冒烟测试通过后发到 GitHub Release
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 标签要和 package.json 版本一致
+        shell: bash
+        run: |
+          v=$(node -p "require('./package.json').version")
+          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "标签 $GITHUB_REF_NAME 和 package.json 版本 $v 对不上"; exit 1; }
+
+      - run: npm ci
+
+      - name: 打包
+        run: npm run dist
+
+      - name: 冒烟测试：打包后的程序能加载出工具栏
+        shell: pwsh
+        run: |
+          $f = Join-Path $env:RUNNER_TEMP 'smoke.txt'
+          $env:WOW_MOYU_SMOKE = $f
+          $p = Start-Process dist\win-unpacked\wow-moyu.exe -PassThru
+          for ($i = 0; $i -lt 60 -and -not (Test-Path $f); $i++) { Start-Sleep 1 }
+          if (-not (Test-Path $f)) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue; throw '打包后的程序 60 秒内没加载出工具栏' }
+          $r = Get-Content $f -Raw
+          if ($r -ne 'ok') { throw "冒烟测试失败：$r" }
+          Write-Host '冒烟测试通过'
+
+      - name: 发到 Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="$GITHUB_REF_NAME"
+          files=(dist/wow-moyu-*-portable.exe dist/wow-moyu-*-setup.exe)
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "${files[@]}" --clobber
+          else
+            gh release create "$tag" "${files[@]}" --title "WoW 摸鱼 $tag" --notes-file .github/release-notes.md
+          fi

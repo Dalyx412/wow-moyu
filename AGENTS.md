@@ -16,5 +16,6 @@
 ## 打包与启动
 - 用 electron-builder，配置写在 `package.json` 的 `build` 字段。exe 名是 `wow-moyu.exe`，显示名是「WoW 摸鱼」。
 - `npm run install-local`：先打包 `dist/win-unpacked`，再由 `scripts/install-local.ps1` 复制到 `%LOCALAPPDATA%\Programs\wow-moyu`，并建桌面和开始菜单快捷方式。程序在运行时脚本会拒绝覆盖。脚本必须保存成带 BOM 的 UTF-8，否则 Windows PowerShell 5 会把中文读乱。
-- `npm run dist`：打便携版单文件 exe。
+- `npm run dist`：打便携版和 NSIS 安装版（一键安装到当前用户，自动建桌面快捷方式），输出到 `dist/`。
+- 发布：`.github/workflows/release.yml` 在推 `v*` 标签时触发。它先检查标签和 `package.json` 版本是否一致，再在 windows-latest 上 `npm run dist`。然后做冒烟测试：设 `WOW_MOYU_SMOKE=<文件>` 启动打包后的 exe，工具栏加载完、图标读得到就写 ok 并退出。测试过了，才把两个 exe 发到 Release，说明文字用 `.github/release-notes.md`。
 - 登录状态存在 `persist:overlay` 分区里，和 Chrome 分开。

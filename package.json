@@ -10,7 +10,7 @@
     "start": "electron .",
     "selftest": "electron . --selftest",
     "pack": "electron-builder --win dir",
-    "dist": "electron-builder --win portable",
+    "dist": "electron-builder --win portable nsis --publish never",
     "install-local": "npm run pack && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-local.ps1"
   },
   "build": {
@@ -20,7 +20,15 @@
     "files": ["src/**", "assets/**", "package.json"],
     "directories": { "output": "dist" },
     "win": { "icon": "assets/icon.png" },
-    "portable": { "artifactName": "wow-moyu-${version}-portable.exe" }
+    "portable": { "artifactName": "wow-moyu-${version}-portable.exe" },
+    "nsis": {
+      "artifactName": "wow-moyu-${version}-setup.exe",
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "WoW 摸鱼"
+    }
   },
   "devDependencies": {
     "electron": "^45.0.0",

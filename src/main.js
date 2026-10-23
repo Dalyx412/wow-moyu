@@ -237,6 +237,9 @@ if (selftest) {
   fs.mkdirSync(selftest, { recursive: true });
   app.setPath('userData', path.join(selftest, 'profile'));
 }
+// 冒烟测试（发布流程用）：WOW_MOYU_SMOKE=<文件>，工具栏加载完、图标读得到就写 ok 并退出
+const smoke = process.env.WOW_MOYU_SMOKE;
+if (smoke) app.setPath('userData', path.join(app.getPath('temp'), 'wow-moyu-smoke'));
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -247,6 +250,11 @@ if (!app.requestSingleInstanceLock()) {
     createWindow();
     createTray();
     if (selftest) require('./selftest')(selftest, { actions, win, tabs: () => tabs, collapsed: () => collapsed, initialBounds });
+    if (smoke) win.webContents.once('did-finish-load', () => {
+      const iconOk = !nativeImage.createFromPath(ICON).isEmpty();
+      fs.writeFileSync(smoke, iconOk ? 'ok' : 'icon missing');
+      app.quit();
+    });
   });
   app.on('window-all-closed', () => app.quit());
 }
