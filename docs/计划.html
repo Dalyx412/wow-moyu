@@ -1,0 +1,713 @@
+<title>wow-moyu 计划</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* layout: 一栏阅读；顶部吸附章节条；§0 问题卡 → §0A 已定 → 正文依据；卡片与正文双向链接，右下角返回按钮；聚焦时无关大节折叠 */
+:root {
+  --bg: #f2f4f7; --surface: #ffffff; --fg: #17202b; --muted: #586474; --line: #d5dce5;
+  --accent: #2a59b0; --accent-soft: #e3ebf8;
+  --ok: #1d7650; --ok-soft: #ddf0e5;
+  --warn: #9a5d0a; --warn-soft: #f6e9d4;
+  --code: #e9edf2;
+  --display: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --stick: calc(58px + env(safe-area-inset-top, 0px));
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #10151b; --surface: #171e27; --fg: #e1e6ec; --muted: #97a2b0; --line: #2a3440;
+  --accent: #7ea6ee; --accent-soft: #1b2940; --ok: #5cc592; --ok-soft: #16332a;
+  --warn: #e2a64c; --warn-soft: #382a14; --code: #1e2630; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #10151b; --surface: #171e27; --fg: #e1e6ec; --muted: #97a2b0; --line: #2a3440;
+  --accent: #7ea6ee; --accent-soft: #1b2940; --ok: #5cc592; --ok-soft: #16332a;
+  --warn: #e2a64c; --warn-soft: #382a14; --code: #1e2630; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font: 16px/1.75 var(--body); }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 4px 112px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 章节条 */
+.strip { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; background: var(--bg); border-bottom: 1px solid var(--line); }
+.strip .inner { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-block: 9px; max-width: 760px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.strip a { flex: none; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); text-decoration: none;
+  padding: 3px 11px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+.strip a:hover { color: var(--fg); border-color: var(--muted); }
+.strip a.is-folded { border-style: dashed; }
+.badge { font: 600 11px/1 var(--mono); background: var(--warn); color: var(--surface); border-radius: 999px; padding: 3px 6px; }
+
+/* 标题与正文 */
+h1 { font: 800 27px/1.3 var(--display); margin: 22px 0 2px; text-wrap: balance; }
+h1 .ver { font: 600 14px var(--mono); color: var(--muted); margin-left: 8px; vertical-align: 3px; }
+.meta { margin: 0 0 14px; font-size: 13.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+h2 { font: 600 21px/1.4 var(--display); margin: 46px 0 10px; padding-top: 8px; border-top: 2px solid var(--fg); text-wrap: balance; scroll-margin-top: var(--stick); }
+h3 { font-size: 16.5px; font-weight: 700; margin: 28px 0 6px; scroll-margin-top: var(--stick); text-wrap: balance; }
+.no { font: 600 .82em var(--mono); color: var(--accent); margin-right: .55em; }
+p, li { margin: 6px 0; }
+ul, ol { padding-left: 1.3em; margin: 6px 0; }
+code { font: 13.5px var(--mono); background: var(--code); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { font: 13.5px/1.65 var(--mono); background: var(--code); padding: 12px 14px; border-radius: 8px; margin: 0; }
+.scroll { overflow-x: auto; margin: 10px 0; }
+table { border-collapse: collapse; font-size: 14.5px; min-width: 100%; }
+th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+th { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: .02em; white-space: nowrap; }
+td { min-width: 5em; }
+td.num { min-width: 0; font-variant-numeric: tabular-nums; }
+.note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 8px 12px; margin: 10px 0; font-size: 14.5px; }
+.note.changes { border-left-color: var(--ok); background: var(--ok-soft); }
+.conn { margin: 10px 0; padding: 8px 12px; border-radius: 8px; font-size: 14px; background: var(--warn-soft); color: var(--warn); }
+.hint { font-size: 13.5px; color: var(--muted); }
+.aside-me { font-size: 13.5px; color: var(--muted); }
+.viewbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 10px 0 0; font-size: 13.5px; color: var(--muted); }
+
+/* 状态标签：待你回答 / Claude 已回复 / 已答等 Claude */
+.chip { display: inline-block; font-size: 12px; font-weight: 700; line-height: 1.8; padding: 0 9px; border-radius: 999px; white-space: nowrap; letter-spacing: .02em; }
+.chip.open { background: var(--warn-soft); color: var(--warn); }
+.chip.wait-you { background: var(--accent-soft); color: var(--accent); }
+.chip.wait-claude { background: var(--ok-soft); color: var(--ok); }
+.tally { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 14px; color: var(--muted); margin: 8px 0 4px; }
+
+/* 问题卡 */
+.cards { display: grid; gap: 12px; margin: 12px 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+  display: grid; gap: 9px; min-width: 0; scroll-margin-top: var(--stick); }
+.card[data-state="wait-you"] { border-color: var(--accent); }
+.card[data-state="wait-claude"] { border-color: var(--ok); }
+.card-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.qn { font: 600 13px var(--mono); color: var(--muted); flex: none; }
+.qt { margin: 0; font-size: 16.5px; font-weight: 700; line-height: 1.5; flex: 1 1 14em; min-width: 0; }
+.qd { margin: 0; font-size: 15px; }
+.rec { margin: 0; font-size: 15px; color: var(--muted); }
+.tag { font-size: 12px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 1px 6px; border-radius: 4px; margin-right: 6px; }
+.refs { margin: 0; display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: 13.5px; color: var(--muted); }
+.refs > span { font-weight: 700; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt { font: inherit; font-size: 14.5px; min-height: 40px; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--fg); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.opt.sm { font-size: 13.5px; min-height: 32px; padding: 3px 12px; }
+.opt .rk { font-size: 11px; font-weight: 700; color: var(--accent); }
+.opt[aria-pressed="true"][data-tone="ok"] { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.opt[aria-pressed="true"][data-tone="warn"] { background: var(--warn); border-color: var(--warn); color: var(--surface); }
+.opt[aria-pressed="true"][data-tone="pick"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.opt[aria-pressed="true"] .rk { color: inherit; }
+.opt:disabled { opacity: .55; cursor: default; }
+.is-demo .opt { cursor: default; }
+textarea.note { font: inherit; font-size: 15px; width: 100%; min-height: 66px; box-sizing: border-box; padding: 8px 10px; margin: 0;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); resize: vertical; }
+textarea.note:disabled { opacity: .55; }
+.save { margin: 0; min-height: 1.3em; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.is-demo { border-style: dashed; }
+
+/* 对话串 */
+.thread { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.msg { margin: 0; padding: 8px 12px; border-radius: 8px; font-size: 15px; min-width: 0; }
+.msg.user { background: var(--bg); border: 1px solid var(--line); }
+.msg.claude { background: var(--accent-soft); }
+.mh { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+.mh .who { font-weight: 700; }
+.msg.claude .who { color: var(--accent); }
+.mh time { font-family: var(--mono); }
+.msg p { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* 正文里的「相关问题」 */
+.backlinks { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 10px; font-size: 13px; color: var(--muted); }
+.backlinks > span { margin-right: 2px; }
+.bl { font: 600 12.5px/1.8 var(--mono); padding: 0 9px; border-radius: 999px; text-decoration: none; border: 1px solid currentColor; }
+.bl.open { color: var(--warn); } .bl.wait-you { color: var(--accent); } .bl.wait-claude, .bl.done { color: var(--ok); }
+.backlinks .sep { width: 1px; height: 14px; background: var(--line); margin: 0 4px; }
+
+/* 聚焦：折叠和本轮问题无关的大节 */
+.fold-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: -2px 0 8px; }
+.fold-btn { font: inherit; font-size: 13.5px; color: var(--accent); background: none; border: 0; padding: 4px 0; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 4px; }
+.chap.folded > :not(h2):not(.fold-row) { display: none !important; }
+.chap.folded > h2 { color: var(--muted); }
+
+/* 小节意见框、其他意见、本轮答完了 */
+.secnote { margin: 22px 0 0; padding-top: 10px; border-top: 1px dashed var(--line); display: grid; gap: 8px; scroll-margin-top: var(--stick); }
+.sn-toggle { justify-self: start; font: inherit; font-size: 13.5px; color: var(--muted); background: none; border: 0; padding: 4px 0; cursor: pointer;
+  text-decoration: underline dotted; text-underline-offset: 4px; }
+.sn-title { margin: 0; font-weight: 700; font-size: 15px; }
+.sn-body { display: grid; gap: 8px; }
+.roundbox { display: grid; gap: 10px; margin-top: 18px; }
+.round-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.roundbox .hint { margin: 0; }
+
+/* 已定事项 */
+.decided { list-style: none; margin: 10px 0; padding: 0; }
+.decided li { display: grid; grid-template-columns: 2.8em 1fr; gap: 0 8px; padding: 10px 0; margin: 0; border-bottom: 1px solid var(--line); scroll-margin-top: var(--stick); }
+.decided .dn { font: 600 13px var(--mono); color: var(--ok); padding-top: 3px; }
+.decided .dt { min-width: 0; }
+.decided .dm { grid-column: 2; display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: 13px; color: var(--muted); }
+details.older { margin: 4px 0 0; }
+details.older > summary { cursor: pointer; font-size: 14px; color: var(--muted); padding: 6px 0; }
+details.older[open] > summary { color: var(--fg); }
+
+/* 跳转高亮与返回按钮 */
+.flash { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+@media (prefers-reduced-motion: no-preference) { .card, .decided li, h2, h3 { transition: outline-color .3s; } }
+.backpill { position: fixed; z-index: 5; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  font: 600 14px var(--body); padding: 10px 16px; border: 0; border-radius: 999px; background: var(--fg); color: var(--bg);
+  box-shadow: 0 6px 18px rgb(0 0 0 / .22); cursor: pointer; max-width: calc(100vw - 32px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+@media (max-width: 480px) {
+  h1 { font-size: 23px; }
+  .card { padding: 12px 13px; }
+  .opts .opt { flex: 1 1 auto; justify-content: center; }
+}
+</style>
+
+<nav class="strip" id="strip" aria-label="章节"><div class="inner"></div></nav>
+
+<main class="wrap">
+<header>
+  <h1>wow-moyu 计划<span class="ver">第 3 轮</span></h1>
+  <p class="meta">2026-10-23 更新 · WoW 摸鱼：打本时叠在魔兽画面上的小网页窗口，用来玩雀魂、PokéBonk、查资料。第一版已打包，桌面上有快捷方式，代码已公开在 GitHub。</p>
+  <aside class="note"><strong>怎么用：</strong>在 §0 的卡片里点按钮作答，选了就自动保存；要改的写进意见框。卡片里蓝色的 § 链接跳到正文依据，正文小节下的 Q 标签跳回问题；跳过去以后，右下角的「返回」按钮带你回原处。答完在对话里跟我说一声“看稿”。</aside>
+  <aside class="note changes"><strong>本轮变化：</strong>项目改名叫 wow-moyu（显示名「WoW 摸鱼」），加了小鱼图标；打包成 exe，装到本机并放了桌面快捷方式；代码推到了公开仓库。详见 §4.2。没有新问题。</aside>
+  <p class="viewbar"><button type="button" id="focus-toggle" class="opt sm" data-tone="pick" aria-pressed="true">聚焦</button><span id="focus-hint">开着时，正文只展开和 §0 问题有关的大节。</span></p>
+  <p id="conn" class="conn">正在连接，连上就能作答。</p>
+</header>
+
+<section class="chap0">
+  <h2 id="s0" data-short="正在讨论"><span class="no">0</span>正在讨论</h2>
+  <div class="tally" id="tally"></div>
+  <div class="cards" id="cards"></div>
+  <div class="roundbox">
+    <div id="gen-slot"></div>
+    <div class="round-row">
+      <button type="button" id="round-done" class="opt" data-tone="ok" aria-pressed="false" disabled>本轮答完了</button>
+      <span id="round-st" class="save"></span>
+    </div>
+    <p class="hint">点完以后在对话里说一声“看稿”，我就去读。计划里的回答不会自动通知我。</p>
+  </div>
+</section>
+
+<section class="chap0">
+  <h2 id="s0a" data-short="已定"><span class="no">0A</span>已定事项</h2>
+  <p class="hint" id="decided-hint"></p>
+  <ol class="decided" id="decided"></ol>
+</section>
+
+<!-- ================= 正文：每个 h2 / h3 带 id，问题卡的 refs 填这些 id ================= -->
+
+<section class="chap">
+  <h2 id="s-status" data-short="现状"><span class="no">1</span>现状</h2>
+  <p><strong>结论：能做。</strong>叠加层窗口里跑的就是一个普通的浏览器内核，雀魂和 PokéBonk 这类网页游戏都能直接打开。真正要选的只是“窗口怎么叠到魔兽上面”。</p>
+  <section class="sub">
+    <h3 id="s-archon"><span class="no">1.1</span>你现在的 WCL 叠加层是怎么做的</h3>
+    <p>你在用的是 <strong>Archon App</strong>（Warcraft Logs 官方客户端）。我查了正在运行的魔兽进程：它是用 Overwolf 的 ow-electron 框架做的，往魔兽进程里加载了 Overwolf 的叠加层模块，所以面板能直接画在游戏画面里。</p>
+    <p>这类注入暴雪一直默许，你在国服用它也没出问题。所以“做一个差不多的”在技术上成立，风险也和 Archon 同级。但这条路有申请门槛，见 <a href="#s-route-b">§2.2</a>。</p>
+  </section>
+  <section class="sub">
+    <h3 id="s-addon"><span class="no">1.2</span>为什么不做成游戏内插件</h3>
+    <p>魔兽插件跑在暴雪的沙盒里，不能联网，也不能打开网页，这条路走不通。插件只能做离线的东西，比如打包好的资料、用 Lua 写的扫雷。你要玩的是现成的网页游戏，所以只能做游戏外的叠加窗口。</p>
+  </section>
+</section>
+
+<section class="chap">
+  <h2 id="s-routes" data-short="路线"><span class="no">2</span>两条路线</h2>
+  <div class="scroll"><table>
+    <tr><th></th><th>A 独立置顶窗口</th><th>B 游戏内叠加（同 Archon）</th></tr>
+    <tr><td>碰不碰魔兽进程</td><td>不碰</td><td>加载 Overwolf 模块，和 Archon 一样</td></tr>
+    <tr><td>魔兽显示模式</td><td>必须用窗口化全屏（无边框）</td><td>都行</td></tr>
+    <tr><td>操作小窗时</td><td>键盘焦点离开魔兽，按热键切回</td><td>在游戏里按热键接管鼠标键盘，再按一次还给游戏</td></tr>
+    <tr><td>门槛</td><td>无，今晚就能开工</td><td>要先申请 Overwolf 开发者凭证</td></tr>
+    <tr><td>工作量</td><td>一两天做到顺手</td><td>A 的工作量，再加上申请和调试叠加层</td></tr>
+  </table></div>
+  <section class="sub">
+    <h3 id="s-route-a"><span class="no">2.1</span>路线 A：独立置顶窗口</h3>
+    <p>一个无边框、永远置顶、可以调透明度的浏览器小窗，盖在魔兽上面。魔兽切到窗口化全屏后，看起来就和叠在游戏里差不多；正式服在这个模式下几乎不掉帧。</p>
+    <p>关键是两个热键：一个<strong>显示/隐藏</strong>；一个<strong>切换“可操作 / 鼠标穿透”</strong>。穿透状态下，小窗只是一层半透明的画面，鼠标点下去直接点到魔兽，适合挂着看攻略。</p>
+    <p>短板：要点小窗里的东西，焦点就离开魔兽，这时候按技能键没反应，得用热键切回去。回合制的雀魂影响不大。</p>
+  </section>
+  <section class="sub">
+    <h3 id="s-route-b"><span class="no">2.2</span>路线 B：和 Archon 一样的游戏内叠加</h3>
+    <p>用同一套 Overwolf 框架，把小窗直接画进游戏画面，体验最接近“插件”。</p>
+    <p><strong>门槛：</strong>Overwolf 规定，就算只在自己电脑上用，开发模式也得填 Overwolf 开发者后台账号的邮箱和 API key，或者 Overwolf 发给审批通过开发者的开发密钥。少了这些，叠加层模块就不加载：程序能打开，但叠不进游戏。正式打包还要自己的代码签名证书。也就是说，得先去 Overwolf 申请开发者，要不要批、要等多久不由我们决定。来源：<a href="https://dev.overwolf.com/ow-electron/guides/dev-tools/dev-mode/" target="_blank" rel="noopener">开发模式说明</a>、<a href="https://dev.overwolf.com/ow-electron/guides/dev-tools/app-signing" target="_blank" rel="noopener">签名说明</a>。</p>
+    <p>A 里网页、标签页、热键这部分代码以后可以原样搬进 B，所以先做 A 不会白做。</p>
+  </section>
+</section>
+
+<section class="chap">
+  <h2 id="s-games" data-short="游戏"><span class="no">3</span>两个游戏适不适合边打边玩</h2>
+  <section class="sub">
+    <h3 id="s-majsoul"><span class="no">3.1</span>雀魂</h3>
+    <p><strong>很合适。</strong>网页版直接能跑，又是回合制，等技能冷却、跑位间隙都能出一张牌。要注意每手有出牌计时，boss 战里顾不上时可能超时被自动摸切，所以更适合友人场和休闲场，段位场慎用。登录一次就行，登录状态存在叠加窗口自己的浏览器里，和你的 Chrome 分开。</p>
+  </section>
+  <section class="sub">
+    <h3 id="s-pokebonk"><span class="no">3.2</span>PokéBonk</h3>
+    <p><strong>能开，但只适合打本间隙玩。</strong>它是 3D 的“幸存者”类游戏，得一直操作走位，所以只能在跑尸、等拉怪、灭团整备时玩，打 boss 时没法同时玩。</p>
+    <p>它还会和魔兽抢显卡。小窗隐藏后，浏览器会自动停掉画面刷新，多数网页游戏这时等于暂停。但小窗显示着、只是没在操作的时候不会自动停，所以会加一个“失焦就限帧”的选项，免得拖慢魔兽。</p>
+  </section>
+</section>
+
+<section class="chap">
+  <h2 id="s-next" data-short="第一版"><span class="no">4</span>第一版做什么</h2>
+  <p>小窗常驻屏幕一角，默认占四分之一屏幕、半透明，不用热键。用法：点小窗就操作小窗，点回魔兽画面就回到游戏。</p>
+  <ul>
+    <li><strong>顶部工具栏</strong>：拖动它移动窗口，右下角拖动改大小，位置和大小都会记住；</li>
+    <li><strong>书签按钮</strong>：雀魂、PokéBonk、NGA 魔兽板块、Wowhead 中文站，点一下打开，已经开着就切过去。☆ 把当前页加进书签，右键书签删除；</li>
+    <li><strong>标签</strong>：每个打开的站一个标签，× 关闭；</li>
+    <li><strong>透明度滑块</strong>、<strong>静音</strong>按钮；</li>
+    <li><strong>收起</strong>按钮：整个窗口缩成一根小条，网页全部暂停、静音；再点一下展开回原样。这就是“快速开关”；</li>
+    <li>登录状态保存；托盘图标负责显示和退出；开机不自启。</li>
+  </ul>
+  <p>和第 1 轮比，去掉了热键和鼠标穿透（见 §0A #2）。“失焦限帧”换成两条更好实现的：只有当前标签在跑，其他标签暂停；收起时全部暂停。</p>
+  <section class="sub">
+    <h3 id="s-built"><span class="no">4.1</span>做到哪了</h3>
+    <p><strong>第一版已经做好。</strong>启动方式见 §4.2。</p>
+    <p>自动自测 14 项过了 13 项：</p>
+    <ul>
+      <li>默认在主屏右上角、占四分之一屏幕、置顶；</li>
+      <li>点书签打开网页，再点同一个书签会切回已经开着的标签，不会重复开；</li>
+      <li>切到别的标签后，原来的标签被暂停、静音；</li>
+      <li>收起后缩成 240×36 的小条，网页全部暂停；展开后回到原来的位置和大小；</li>
+      <li>输入关键词会走必应搜索；关闭标签、透明度都正常。</li>
+    </ul>
+    <p>没过的一项：Wowhead 的广告一直在加载，30 秒内没停。页面本身已经能看，所以我把判断条件改成“页面能看就算”，但改完还没重跑。</p>
+    <p><strong>还没验证、得你来试：</strong>魔兽在前台、窗口化全屏时，小窗能不能一直盖在上面；开着 PokéBonk 时魔兽掉多少帧；雀魂能不能正常登录。</p>
+  </section>
+  <section class="sub">
+    <h3 id="s-package"><span class="no">4.2</span>打包和启动</h3>
+    <p><strong>平时就点桌面上的「WoW 摸鱼」。</strong>程序装在你用户目录下的 Programs\wow-moyu 里，开始菜单里也有入口。它和项目文件夹是分开的两份，所以之后重新打包，不会影响正在用的那份。</p>
+    <p>改了代码以后，在项目里运行 <code>npm run install-local</code>，就会重新打包、覆盖安装、刷新快捷方式；程序开着的时候会提示你先退出。想打一个能发给别人的单文件版，就运行 <code>npm run dist</code>。</p>
+    <p>代码公开在 <a href="https://github.com/Dalyx412/wow-moyu" target="_blank" rel="noopener">github.com/Dalyx412/wow-moyu</a>。暂时没有许可证，也没有发布页可以直接下载 exe。</p>
+    <p>注意：换了程序名后，登录状态和书签存在新的位置。之前从源码跑的那份里登过的账号，要在新程序里重新登一次。</p>
+  </section>
+</section>
+
+<!-- 阶段归档：一个阶段做完后，把那阶段的已定事项（从 DECIDED 移出，写成静态列表）和用不上的正文收进这里
+<details class="older">
+  <summary>已归档：阶段名（YYYY-MM-DD）</summary>
+  <ol class="decided"><li><span class="dn">#1</span><div class="dt">决定内容</div></li></ol>
+  <p>归档的正文……</p>
+</details>
+-->
+</main>
+
+<button type="button" id="back" class="backpill" hidden></button>
+
+<script>
+/* ================= 1. 本计划内容：每轮只改这里和上面的正文 ================= */
+
+// 正在讨论的问题。题号只增不复用；id 用英文短词，定了不改（数据库按 id 存回答）。
+// refs 填正文小节的 id；不写 options 就是「按建议 / 要修改」。
+// 选项卡写 options（k 是存进数据库的值）和 recKey（建议的那一项）；某个选项需要写理由时加 note: true。
+const QUESTIONS = [];
+
+// 已经拍板的决定。round 是第几轮定的（§0A 只展开最近一轮）；from 写来源，refs 填正文小节 id。
+const DECIDED = [
+  { n: 1, round: 2, text: '走路线 A：独立的置顶小窗盖在魔兽上面，魔兽用窗口化全屏。不申请 Overwolf。', from: 'Q1', refs: ['s-route-a'] },
+  { n: 2, round: 2, text: '不做热键，也不做显示/隐藏、鼠标穿透切换。小窗常驻屏幕一角，约占四分之一屏幕、半透明；打开、关闭、收起全靠小窗顶上的按钮。（按你在 Q3 的意见改）', from: 'Q3', refs: ['s-next'] },
+  { n: 3, round: 2, text: '第一版功能按 §4 清单做，结合 #2 去掉热键和鼠标穿透，“失焦限帧”换成“只有当前标签在跑、收起时全部暂停”。', from: 'Q2', refs: ['s-next', 's-built'] },
+];
+
+// 示例卡只在模版讨论页用；正式计划保持为空。
+const DEMOS = [];
+
+/* ================= 2. 模版逻辑：一般不用改 ================= */
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const DEFAULT_OPTS = [
+    { k: 'accept', label: '按建议', tone: 'ok' },
+    { k: 'change', label: '要修改', tone: 'warn', note: true },
+  ];
+  const ans = {}, rep = {};            // 数据库里的回答、Claude 的回复
+  const views = {};                    // 数据 key → 页面上的卡片或意见框
+  const backChips = {};                // 题 id → 正文里的「相关问题」标签
+  const writing = {}, again = {}, dirty = {}, timers = {}, err = {};
+  let DB = null, readOnly = false, round = {};
+
+  const fmt = iso => {
+    const d = new Date(iso); if (isNaN(d)) return '';
+    const p = n => String(n).padStart(2, '0');
+    return `${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  };
+
+  /* 2.1 小节标签：§1.1 标题 */
+  const LABEL = {};
+  $$('main h2[id], main h3[id]').forEach(h => {
+    const no = h.querySelector('.no');
+    const text = Array.from(h.childNodes).filter(n => n !== no).map(n => n.textContent).join('').trim();
+    LABEL[h.id] = (no ? '§' + no.textContent.trim() + ' ' : '') + text;
+  });
+  const label = id => LABEL[id] || id;
+  $$('section.chap, section.chap0, section.sub').forEach(s => {
+    const h = s.querySelector('h2[id], h3[id]'); if (h) s.dataset.label = label(h.id);
+  });
+
+  /* 2.2 章节条 */
+  const strip = $('#strip .inner');
+  const stripLinks = {};
+  $$('main h2[id]').forEach(h => {
+    const a = document.createElement('a');
+    a.href = '#' + h.id;
+    const no = h.querySelector('.no');
+    a.textContent = (no ? '§' + no.textContent.trim() + ' ' : '') + (h.dataset.short || label(h.id));
+    if (h.id === 's0') { const b = document.createElement('b'); b.className = 'badge'; b.id = 'badge0'; b.hidden = true; a.append(b); }
+    stripLinks[h.id] = a;
+    strip.append(a);
+  });
+
+  /* 2.3 状态 */
+  function statusOf(a, r) {
+    const at = a.at || '', rt = r.at || '';
+    const answered = !!(a.choice || a.note);
+    const talked = Array.isArray(r.thread) && r.thread.length > 0;
+    if (answered && at > rt) return ['wait-claude', '已答 · 等 Claude'];
+    if (talked) return ['wait-you', 'Claude 已回复'];
+    if (answered) return ['wait-claude', '已答 · 等 Claude'];
+    return ['open', '待你回答'];
+  }
+
+  /* 2.4 问题卡与意见框 */
+  function buildCard(q, demo) {
+    const el = document.createElement('article');
+    el.className = 'card' + (demo ? ' is-demo' : '');
+    el.id = (demo ? 'demo-' : 'q-') + q.id;
+    el.dataset.label = q.n;
+    const opts = q.options || DEFAULT_OPTS;
+    const refs = (q.refs || []).map(r => `<a href="#${r}">${label(r)}</a>`).join('');
+    el.innerHTML =
+      `<div class="card-h"><span class="qn">${q.n}</span><h3 class="qt">${q.title}</h3><span class="st chip"></span></div>` +
+      (q.detail ? `<p class="qd">${q.detail}</p>` : '') +
+      `<p class="rec"><span class="tag">建议</span>${q.rec}</p>` +
+      (refs ? `<p class="refs"><span>依据</span>${refs}</p>` : '') +
+      `<div class="opts" role="group" aria-label="${q.n} 的回答">` +
+        opts.map(o => `<button type="button" class="opt" id="${el.id}-${o.k}" data-k="${o.k}" data-tone="${o.tone || 'pick'}" aria-pressed="false"${demo ? ' tabindex="-1" aria-disabled="true"' : ' disabled'}>${o.label}${q.recKey === o.k ? '<span class="rk">建议</span>' : ''}</button>`).join('') +
+      `</div>` +
+      `<ol class="thread" hidden></ol>` +
+      `<textarea class="note" id="${el.id}-note" rows="2" maxlength="4000" aria-label="${q.n} 的意见" hidden${demo ? ' readonly' : ' disabled'}></textarea>` +
+      `<p class="save" aria-live="polite"></p>`;
+    const key = demo ? 'demo:' + q.id : q.id;
+    views[key] = { kind: 'q', el, opts, demo };
+    if (!demo) wire(key, el, opts);
+    return el;
+  }
+
+  function buildNote(key, title, open) {
+    const box = document.createElement('div');
+    box.className = 'secnote';
+    box.id = 'n-' + key;
+    box.innerHTML =
+      (open ? `<p class="sn-title">${title}</p>`
+            : `<button type="button" class="sn-toggle" id="n-${key}-toggle" aria-expanded="false">${title}</button>`) +
+      `<div class="sn-body"${open ? '' : ' hidden'}>` +
+        `<ol class="thread" hidden></ol>` +
+        `<textarea class="note" id="n-${key}-note" rows="2" maxlength="4000" aria-label="${title}" disabled></textarea>` +
+        `<p class="save" aria-live="polite"></p>` +
+      `</div>`;
+    views[key] = { kind: 'note', el: box, title };
+    const t = box.querySelector('.sn-toggle');
+    if (t) t.addEventListener('click', () => setOpen(box, box.querySelector('.sn-body').hidden));
+    wire(key, box, null);
+    return box;
+  }
+
+  function setOpen(box, open) {
+    const body = box.querySelector('.sn-body'), t = box.querySelector('.sn-toggle');
+    body.hidden = !open;
+    if (t) { t.setAttribute('aria-expanded', String(open)); t.textContent = open ? '收起' : views[box.id.slice(2)].title; }
+  }
+
+  function wire(key, el, opts) {
+    $$('.opt', el).forEach(b => b.addEventListener('click', () => {
+      const k = b.dataset.k, cur = (ans[key] || {}).choice;
+      patch(key, { choice: cur === k ? '' : k });
+      save(key);
+      const o = opts && opts.find(x => x.k === k);
+      const ta = $('textarea', el);
+      if (cur !== k && o && o.note) { ta.hidden = false; ta.focus(); }
+    }));
+    const ta = $('textarea', el);
+    ta.addEventListener('input', () => {
+      patch(key, { note: ta.value });
+      clearTimeout(timers[key]);
+      timers[key] = setTimeout(() => save(key), 1000);
+    });
+    ta.addEventListener('blur', () => { if (dirty[key]) save(key); });
+  }
+
+  function msgEl(m) {
+    const li = document.createElement('li');
+    li.className = 'msg ' + (m.who === 'claude' ? 'claude' : 'user');
+    const head = document.createElement('div'); head.className = 'mh';
+    const who = document.createElement('span'); who.className = 'who'; who.textContent = m.who === 'claude' ? 'Claude' : '你';
+    head.append(who);
+    if (m.at) { const t = document.createElement('time'); t.textContent = fmt(m.at); head.append(t); }
+    const p = document.createElement('p'); p.textContent = String(m.text || '');
+    li.append(head, p);
+    return li;
+  }
+
+  function paint(key) {
+    const v = views[key]; if (!v) return;
+    const a = v.demo ? v.demo.answer : (ans[key] || {});
+    const r = v.demo ? v.demo.reply : (rep[key] || {});
+    const thread = Array.isArray(r.thread) ? r.thread : [];
+    const el = v.el, ta = $('textarea', el);
+    if (v.kind === 'q') {
+      const [cls, text] = statusOf(a, r);
+      el.dataset.state = cls;
+      const st = $('.st', el); st.className = 'st chip ' + cls; st.textContent = text;
+      $$('.opt', el).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === a.choice)));
+      (backChips[key] || []).forEach(c => { c.className = 'bl ' + cls; c.title = text; });
+      if (a.choice || a.note || thread.length) ta.hidden = false;
+    } else if ((a.note || thread.length) && !v.opened) { v.opened = true; setOpen(el, true); }
+    if (v.shown !== r) {
+      v.shown = r;
+      const ol = $('.thread', el);
+      ol.replaceChildren(...thread.map(msgEl));
+      ol.hidden = !thread.length;
+    }
+    if (document.activeElement !== ta && !dirty[key]) ta.value = a.note || '';
+    const opt = v.opts && v.opts.find(o => o.k === a.choice);
+    ta.placeholder = thread.length ? '接着回复……'
+      : opt && opt.note ? '要怎么改？写在这里'
+      : v.kind === 'q' ? '想补充的写在这里，可以不写' : '对这一节的意见、补充或纠错';
+    $('.save', el).textContent = v.demo ? '示例，不保存'
+      : writing[key] ? '保存中……'
+      : err[key] ? err[key]
+      : dirty[key] ? '待保存……'
+      : a.at ? '已保存 ' + fmt(a.at) : '';
+  }
+
+  function paintAll() { Object.keys(views).forEach(paint); tally(); }
+
+  function tally() {
+    const c = { open: 0, 'wait-you': 0, 'wait-claude': 0 };
+    QUESTIONS.forEach(q => { c[statusOf(ans[q.id] || {}, rep[q.id] || {})[0]]++; });
+    const box = $('#tally');
+    if (!QUESTIONS.length) { box.textContent = '这一轮没有要你定的问题。'; }
+    else box.innerHTML = `<span>共 ${QUESTIONS.length} 题</span>` +
+      `<span class="chip open">待你回答 ${c.open}</span>` +
+      `<span class="chip wait-you">Claude 已回复 ${c['wait-you']}</span>` +
+      `<span class="chip wait-claude">已答 · 等 Claude ${c['wait-claude']}</span>`;
+    const b = $('#badge0'), need = c.open + c['wait-you'];
+    if (b) { b.hidden = !need; b.textContent = need; }
+  }
+
+  /* 2.5 保存：每条一次只写一个，打字停 1 秒再写 */
+  function patch(key, p) {
+    ans[key] = Object.assign({}, ans[key], p, { at: new Date().toISOString() });
+    dirty[key] = true; err[key] = '';
+    paint(key); tally();
+  }
+
+  async function save(key, retried) {
+    clearTimeout(timers[key]);
+    if (!DB || readOnly || !dirty[key]) return;
+    if (writing[key]) { again[key] = true; return; }
+    writing[key] = true; paint(key);
+    try {
+      do { again[key] = false; await DB.collection('answers').doc(key).set(Object.assign({}, ans[key])); } while (again[key]);
+      dirty[key] = false;
+    } catch (e) {
+      const code = (e && e.code) || 'unavailable';
+      if (code === 'unavailable' && !retried) { setTimeout(() => save(key, true), 800 + Math.random() * 800); }
+      else {
+        if (code === 'invalid_argument') setReadOnly();
+        err[key] = `没保存上（${code}）。稍后再点一次，或在对话里回复这条。`;
+      }
+    } finally { writing[key] = false; paint(key); }
+  }
+
+  /* 2.6 连接状态 */
+  const conn = $('#conn');
+  function setControls(on) {
+    $$('.card:not(.is-demo) .opt, .card:not(.is-demo) textarea, .secnote textarea, #round-done').forEach(x => { x.disabled = !on; });
+  }
+  function setOffline(msg) { conn.hidden = false; conn.textContent = msg; setControls(false); }
+  function setReadOnly() { readOnly = true; setOffline('你对这一页只有查看权限，回答存不了。可以直接在对话里回复题号和意见。'); }
+  function onDbError(e) {
+    if (e && e.code === 'revoked') { setControls(false); return; }
+    setOffline('和这一页的连接断了。刷新一下再试；也可以直接在对话里回复。');
+  }
+
+  /* 2.7 聚焦：只展开和待决问题有关的大节（选择存在看的人自己的浏览器里） */
+  // 有待决问题时按问题的 refs；这一轮没有问题时，按最近一轮定下的事
+  const latestRound = DECIDED.reduce((m, d) => Math.max(m, d.round || 0), 0);
+  const activeIds = new Set(QUESTIONS.length
+    ? QUESTIONS.flatMap(q => q.refs || [])
+    : DECIDED.filter(d => (d.round || 0) === latestRound).flatMap(d => d.refs || []));
+  const focusWhat = QUESTIONS.length ? '§0 问题' : '最近一轮决定';
+  const chaps = $$('section.chap');
+  let focusOn = true;
+  try { focusOn = localStorage.getItem('plan-focus') !== 'off'; } catch (e) {}
+  chaps.forEach(s => {
+    const h = $('h2', s);
+    s._active = $$('[id]', s).some(x => activeIds.has(x.id));
+    const row = document.createElement('div'); row.className = 'fold-row';
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'fold-btn'; b.id = 'fold-' + h.id;
+    const t = document.createElement('span'); t.className = 'hint';
+    row.append(b, t);
+    h.after(row);
+    b.addEventListener('click', () => setFold(s, !s.classList.contains('folded')));
+  });
+  function setFold(s, folded) {
+    s.classList.toggle('folded', folded);
+    const row = $('.fold-row', s);
+    $('.fold-btn', row).textContent = folded ? '展开本节' : '收起本节';
+    $('.fold-btn', row).setAttribute('aria-expanded', String(!folded));
+    $('.hint', row).textContent = folded ? `和${focusWhat}无关，先折起来了` : '';
+    row.hidden = !(folded || (focusOn && !s._active));
+    const a = stripLinks[$('h2', s).id]; if (a) a.classList.toggle('is-folded', folded);
+  }
+  const focusBtn = $('#focus-toggle');
+  function applyFocus() {
+    chaps.forEach(s => setFold(s, focusOn && !s._active));
+    focusBtn.setAttribute('aria-pressed', String(focusOn));
+    focusBtn.textContent = focusOn ? '聚焦：开' : '聚焦：关';
+    $('#focus-hint').textContent = focusOn ? `正文只展开和${focusWhat}有关的大节，其余折起来。` : '正文全部展开。';
+  }
+  focusBtn.addEventListener('click', () => {
+    focusOn = !focusOn;
+    try { localStorage.setItem('plan-focus', focusOn ? 'on' : 'off'); } catch (e) {}
+    applyFocus();
+  });
+
+  /* 2.8 跳转与返回 */
+  const back = $('#back'), stack = [];
+  function reveal(el) {
+    const s = el.closest('section.chap');
+    if (s && s.classList.contains('folded')) setFold(s, false);
+    for (let d = el.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
+  }
+  function go(el, block = 'start') {
+    reveal(el);
+    el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block });
+    const f = el.closest('.card, li, h2, h3, .secnote') || el;
+    f.classList.remove('flash'); void f.offsetWidth; f.classList.add('flash');
+    setTimeout(() => f.classList.remove('flash'), 1600);
+  }
+  function showBack() {
+    const s = stack[stack.length - 1];
+    back.hidden = !s;
+    if (s) back.textContent = '↩ 返回 ' + s.label;
+  }
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const t = document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));
+    if (!t) return;
+    e.preventDefault();
+    if (!a.closest('.strip')) {
+      const src = a.closest('[data-label]');
+      stack.push({ el: a, label: src ? src.dataset.label : '原处' });
+      showBack();
+    }
+    go(t);
+  });
+  back.addEventListener('click', () => {
+    const s = stack.pop(); showBack();
+    if (s) go(s.el.closest('.card, li') || s.el, 'center');
+  });
+
+  /* 2.9 渲染 */
+  const cards = $('#cards');
+  QUESTIONS.forEach(q => cards.append(buildCard(q, false)));
+  const demoSlot = $('#demo-slot');
+  if (demoSlot) DEMOS.forEach(d => { demoSlot.append(buildCard(d.q, true)); views['demo:' + d.q.id].demo = d; });
+
+  // 已定事项：最近一轮展开，更早的折叠
+  const decidedItem = d => {
+    const li = document.createElement('li');
+    li.id = 'd-' + d.n; li.dataset.label = '已定 #' + d.n;
+    li.innerHTML = `<span class="dn">#${d.n}</span><div class="dt">${d.text}</div>` +
+      `<div class="dm"><span>${d.from || ''}</span>${(d.refs || []).map(r => `<a href="#${r}">${label(r)}</a>`).join('')}</div>`;
+    return li;
+  };
+  const latest = DECIDED.reduce((m, d) => Math.max(m, d.round || 0), 0);
+  const recent = DECIDED.filter(d => (d.round || 0) === latest);
+  const older = DECIDED.filter(d => (d.round || 0) < latest);
+  const dl = $('#decided');
+  recent.slice().reverse().forEach(d => dl.append(decidedItem(d)));
+  if (older.length) {
+    const det = document.createElement('details'); det.className = 'older';
+    const sum = document.createElement('summary'); sum.textContent = `更早的决定（${older.length} 条）`;
+    const ol = document.createElement('ol'); ol.className = 'decided';
+    older.slice().reverse().forEach(d => ol.append(decidedItem(d)));
+    det.append(sum, ol);
+    dl.after(det);
+  }
+  $('#decided-hint').textContent = DECIDED.length
+    ? `共 ${DECIDED.length} 条。上面是最近一轮定的 ${recent.length} 条，新的在前${older.length ? '；更早的折叠在下面' : ''}。`
+    : '还没有定下来的事。';
+
+  const refBy = {};
+  const slot = id => (refBy[id] = refBy[id] || { q: [], d: [] });
+  QUESTIONS.forEach(q => (q.refs || []).forEach(r => slot(r).q.push(q)));
+  DECIDED.forEach(d => (d.refs || []).forEach(r => slot(r).d.push(d)));
+  Object.entries(refBy).forEach(([id, g]) => {
+    const h = document.getElementById(id); if (!h) return;
+    const p = document.createElement('p'); p.className = 'backlinks';
+    const tag = (txt) => { const s = document.createElement('span'); s.textContent = txt; return s; };
+    const link = (href, txt, cls) => { const a = document.createElement('a'); a.href = href; a.textContent = txt; a.className = cls; return a; };
+    if (g.q.length) {
+      p.append(tag('相关问题'));
+      g.q.forEach(q => { const a = link('#q-' + q.id, q.n, 'bl open'); (backChips[q.id] = backChips[q.id] || []).push(a); p.append(a); });
+    }
+    if (g.q.length && g.d.length) { const s = document.createElement('i'); s.className = 'sep'; p.append(s); }
+    if (g.d.length) { p.append(tag('已定')); g.d.forEach(d => p.append(link('#d-' + d.n, '#' + d.n, 'bl done'))); }
+    h.after(p);
+  });
+
+  $$('a.xref[href^="#q-"]').forEach(a => {
+    const q = QUESTIONS.find(x => '#q-' + x.id === a.getAttribute('href'));
+    if (q) a.textContent = q.n;
+  });
+
+  $$('section.chap').forEach(s => {
+    const h = $('h2[id]', s); if (!h) return;
+    s.append(buildNote('sec-' + h.id, '对本节写意见', false));
+  });
+  $('#gen-slot').append(buildNote('_general', '其他意见（不属于任何一题）', true));
+
+  applyFocus();
+  paintAll();
+  if (location.hash.length > 1) { const t = document.getElementById(location.hash.slice(1)); if (t) setTimeout(() => go(t), 60); }
+
+  /* 2.10 本轮答完了 */
+  const roundBtn = $('#round-done'), roundSt = $('#round-st');
+  function paintRound() {
+    roundBtn.setAttribute('aria-pressed', String(!!round.done));
+    roundBtn.textContent = round.done ? '已标记：本轮答完了' : '本轮答完了';
+    roundSt.textContent = round.done && round.at ? fmt(round.at) + ' 标记，再点一下可撤回' : '';
+  }
+  roundBtn.addEventListener('click', async () => {
+    if (!DB || readOnly) return;
+    round = { done: !round.done, at: new Date().toISOString() };
+    paintRound();
+    try { await DB.doc('meta/round').set(Object.assign({}, round)); }
+    catch (e) { roundSt.textContent = '没保存上，在对话里说一声就行。'; }
+  });
+
+  /* 2.11 连接数据库 */
+  (async () => {
+    const db = window.claude && window.claude.use ? await window.claude.use('db') : null;
+    if (!db) { setOffline('这一页现在存不了回答（要在 claude.ai 登录后打开）。可以直接在对话里回复题号和意见，比如“Q3 要修改：……”。'); return; }
+    DB = db;
+    conn.hidden = true;
+    setControls(true);
+    db.collection('answers').onSnapshot(snap => {
+      const next = {};
+      snap.docs.forEach(d => { next[d.id] = d.data(); });
+      Object.keys(ans).forEach(k => { if (dirty[k] || writing[k]) next[k] = ans[k]; delete ans[k]; });
+      Object.assign(ans, next);
+      paintAll();
+    }, onDbError);
+    db.collection('replies').onSnapshot(snap => {
+      Object.keys(rep).forEach(k => delete rep[k]);
+      snap.docs.forEach(d => { rep[d.id] = d.data(); });
+      paintAll();
+    }, onDbError);
+    db.doc('meta/round').onSnapshot(s => { round = s.exists ? s.data() : {}; paintRound(); }, onDbError);
+  })();
+})();
+</script>

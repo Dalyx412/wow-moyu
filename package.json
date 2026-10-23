@@ -1,0 +1,29 @@
+{
+  "name": "wow-moyu",
+  "version": "0.1.0",
+  "private": true,
+  "description": "WoW 摸鱼：打本时叠在魔兽画面上的置顶网页小窗",
+  "author": "Dalyx412",
+  "repository": "github:Dalyx412/wow-moyu",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "selftest": "electron . --selftest",
+    "pack": "electron-builder --win dir",
+    "dist": "electron-builder --win portable",
+    "install-local": "npm run pack && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-local.ps1"
+  },
+  "build": {
+    "appId": "io.github.dalyx412.wowmoyu",
+    "productName": "WoW 摸鱼",
+    "executableName": "wow-moyu",
+    "files": ["src/**", "assets/**", "package.json"],
+    "directories": { "output": "dist" },
+    "win": { "icon": "assets/icon.png" },
+    "portable": { "artifactName": "wow-moyu-${version}-portable.exe" }
+  },
+  "devDependencies": {
+    "electron": "^45.0.0",
+    "electron-builder": "^26.15.3"
+  }
+}

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+<title>WoW 摸鱼</title>
+<style>
+  :root { --bar: 36px; --bg: #1b1f27; --fg: #dfe4ea; --muted: #8b95a3; --line: #2e3542; --accent: #e0a040; --hover: #2a313d; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg);
+    font: 13px/1 "Microsoft YaHei", "PingFang SC", sans-serif; overflow: hidden; user-select: none; }
+  .bar { height: var(--bar); display: flex; align-items: center; gap: 2px; padding: 0 4px;
+    border-bottom: 1px solid var(--line); -webkit-app-region: drag; }
+  .bar button, .bar input, .strip { -webkit-app-region: no-drag; }
+  .grip { color: var(--muted); padding: 0 4px; letter-spacing: -2px; }
+  .strip { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+  .strip::-webkit-scrollbar { display: none; }
+  .spacer { flex: 1; min-width: 12px; height: 100%; }
+  button { font: inherit; color: var(--fg); background: none; border: 0; border-radius: 5px; height: 26px; padding: 0 8px;
+    cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+  button:hover { background: var(--hover); }
+  .item { color: var(--muted); max-width: 140px; }
+  .item span { overflow: hidden; text-overflow: ellipsis; }
+  .item.open { color: var(--fg); }
+  .item.active { color: var(--accent); background: var(--hover); box-shadow: inset 0 -2px 0 var(--accent); }
+  .item .x { display: none; color: var(--muted); padding: 0 2px; border-radius: 3px; }
+  .item.open .x { display: inline; }
+  .item .x:hover { color: var(--fg); background: #444c5a; }
+  .sep { width: 1px; height: 16px; background: var(--line); margin: 0 4px; flex: none; }
+  .ic { padding: 0 6px; color: var(--muted); }
+  .ic:hover { color: var(--fg); }
+  .ic.on { color: var(--accent); }
+  input[type=range] { width: 70px; accent-color: var(--accent); }
+  #url { width: 160px; height: 24px; font: inherit; color: var(--fg); background: #11151b; border: 1px solid var(--line);
+    border-radius: 5px; padding: 0 6px; display: none; }
+  body.typing #url { display: block; }
+  .empty { position: absolute; inset: var(--bar) 0 0 0; display: grid; place-content: center; text-align: center;
+    color: var(--muted); line-height: 1.8; }
+  /* 收起成小条时只留拖动把手、名字、展开和退出 */
+  body.collapsed .strip, body.collapsed .full, body.collapsed .empty, body.collapsed #url { display: none !important; }
+  body:not(.collapsed) .mini { display: none; }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <span class="grip" title="拖动移动窗口">⋮⋮</span>
+    <span class="mini" style="color:var(--muted)">WoW 摸鱼</span>
+    <div class="strip" id="strip"></div>
+    <button class="ic full" id="plus" title="打开网址或搜索">＋</button>
+    <input id="url" placeholder="网址或关键词，回车" spellcheck="false">
+    <div class="spacer"></div>
+    <button class="ic full" id="back" title="后退">←</button>
+    <button class="ic full" id="reload" title="刷新">↻</button>
+    <button class="ic full" id="star" title="把当前页加进书签">☆</button>
+    <span class="sep full"></span>
+    <input class="full" type="range" id="opacity" min="30" max="100" title="透明度">
+    <button class="ic full" id="mute" title="静音">🔊</button>
+    <button class="ic" id="collapse" title="收起">▁</button>
+    <button class="ic" id="quit" title="退出">✕</button>
+  </div>
+  <div class="empty" id="empty">点上面的书签打开网页<br>右键书签可以删除，☆ 把当前页加进书签</div>
+  <script src="toolbar.js"></script>
+</body>
+</html>
