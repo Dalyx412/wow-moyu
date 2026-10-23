@@ -164,10 +164,10 @@ details.older[open] > summary { color: var(--fg); }
 
 <main class="wrap">
 <header>
-  <h1>wow-moyu 计划<span class="ver">第 3 轮</span></h1>
-  <p class="meta">2026-10-23 更新 · WoW 摸鱼：打本时叠在魔兽画面上的小网页窗口，用来玩雀魂、PokéBonk、查资料。第一版已打包，桌面上有快捷方式，代码已公开在 GitHub。</p>
+  <h1>wow-moyu 计划<span class="ver">第 4 轮</span></h1>
+  <p class="meta">2026-10-23 更新 · WoW 摸鱼：打本时叠在魔兽画面上的小网页窗口，用来玩雀魂、PokéBonk、查资料。v0.1.0 已经发到 GitHub Release，别人下载 exe 就能用。</p>
   <aside class="note"><strong>怎么用：</strong>在 §0 的卡片里点按钮作答，选了就自动保存；要改的写进意见框。卡片里蓝色的 § 链接跳到正文依据，正文小节下的 Q 标签跳回问题；跳过去以后，右下角的「返回」按钮带你回原处。答完在对话里跟我说一声“看稿”。</aside>
-  <aside class="note changes"><strong>本轮变化：</strong>项目改名叫 wow-moyu（显示名「WoW 摸鱼」），加了小鱼图标；打包成 exe，装到本机并放了桌面快捷方式；代码推到了公开仓库。详见 §4.2。没有新问题。</aside>
+  <aside class="note changes"><strong>本轮变化：</strong>做了自动发布：推一个版本标签，GitHub 就会自己打包、测试，再把便携版和安装版发到 Release。v0.1.0 已经发出去了，见 §4.3。项目文件夹也改名成 wow-moyu 了。没有新问题。</aside>
   <p class="viewbar"><button type="button" id="focus-toggle" class="opt sm" data-tone="pick" aria-pressed="true">聚焦</button><span id="focus-hint">开着时，正文只展开和 §0 问题有关的大节。</span></p>
   <p id="conn" class="conn">正在连接，连上就能作答。</p>
 </header>
@@ -275,8 +275,18 @@ details.older[open] > summary { color: var(--fg); }
     <h3 id="s-package"><span class="no">4.2</span>打包和启动</h3>
     <p><strong>平时就点桌面上的「WoW 摸鱼」。</strong>程序装在你用户目录下的 Programs\wow-moyu 里，开始菜单里也有入口。它和项目文件夹是分开的两份，所以之后重新打包，不会影响正在用的那份。</p>
     <p>改了代码以后，在项目里运行 <code>npm run install-local</code>，就会重新打包、覆盖安装、刷新快捷方式；程序开着的时候会提示你先退出。想打一个能发给别人的单文件版，就运行 <code>npm run dist</code>。</p>
-    <p>代码公开在 <a href="https://github.com/Dalyx412/wow-moyu" target="_blank" rel="noopener">github.com/Dalyx412/wow-moyu</a>。暂时没有许可证，也没有发布页可以直接下载 exe。</p>
+    <p>代码公开在 <a href="https://github.com/Dalyx412/wow-moyu" target="_blank" rel="noopener">github.com/Dalyx412/wow-moyu</a>，暂时还没有许可证。</p>
     <p>注意：换了程序名后，登录状态和书签存在新的位置。之前从源码跑的那份里登过的账号，要在新程序里重新登一次。</p>
+  </section>
+  <section class="sub">
+    <h3 id="s-release"><span class="no">4.3</span>给别人用：GitHub Release</h3>
+    <p><strong>能做，已经发了 v0.1.0。</strong>别人打开 <a href="https://github.com/Dalyx412/wow-moyu/releases/latest" target="_blank" rel="noopener">Release 页</a>，下载其中一个 exe 就能用，各约 100 MB：</p>
+    <ul>
+      <li><strong>便携版</strong>：双击就能运行，不用安装。每次启动要先解压，会慢几秒；</li>
+      <li><strong>安装版</strong>：双击后自动装到当前用户下，并建桌面和开始菜单快捷方式。之后启动快，也能在系统的「应用」里卸载。</li>
+    </ul>
+    <p><strong>以后怎么发新版：</strong>改 package.json 里的版本号，提交后推一个同名标签（比如 v0.2.0）。GitHub 会在 Windows 机器上打包，自动启动一次打包好的程序，确认工具栏能加载出来，然后才发布。v0.1.0 这一遍全部通过。我还把发布出来的两个 exe 下载回来核对过：名字和版本都对。</p>
+    <p><strong>已知限制：</strong>exe 没有代码签名，别人第一次运行时 Windows 可能会提示“已保护你的电脑”，要点「更多信息」→「仍要运行」。Release 说明里已经写了这一步。要去掉这个提示，得买代码签名证书，一年几百到上千元。</p>
   </section>
 </section>
 
